@@ -76,7 +76,7 @@ public  abstract class OperationImpl extends BaseOperationImpl
   private static final AtomicInteger SEQ_NUMBER = new AtomicInteger(0);
 
   // request header fields
-  private final byte cmd;
+  protected final byte cmd;
   protected short vbucket = 0;
   protected final int opaque;
 
@@ -361,7 +361,7 @@ public  abstract class OperationImpl extends BaseOperationImpl
    * @param bb the buffer where to append.
    * @param extraHeaders the headers to append.
    */
-  private void addExtraHeaders(final ByteBuffer bb,
+  protected void addExtraHeaders(final ByteBuffer bb,
     final Object... extraHeaders) {
     for (Object o : extraHeaders) {
       if (o instanceof Integer) {
@@ -384,7 +384,7 @@ public  abstract class OperationImpl extends BaseOperationImpl
    * @param extraHeaders the list of extra headers to count.
    * @return the length of the extra headers.
    */
-  private int calculateExtraLength(final Object... extraHeaders) {
+  protected int calculateExtraLength(final Object... extraHeaders) {
     int extraLen = 0;
     for (Object o : extraHeaders) {
       if (o instanceof Integer) {

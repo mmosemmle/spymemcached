@@ -122,11 +122,11 @@ public final class StringUtils {
   public static void validateKey(final String key, final boolean binary) {
     byte[] keyBytes = KeyUtil.getKeyBytes(key);
     int keyLength = keyBytes.length;
-
+/*
     if (keyLength > MAX_KEY_LENGTH) {
       throw KEY_TOO_LONG_EXCEPTION;
     }
-
+*/
     if (keyLength == 0) {
       throw KEY_EMPTY_EXCEPTION;
     }

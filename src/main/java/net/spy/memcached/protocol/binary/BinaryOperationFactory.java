@@ -99,6 +99,10 @@ public class BinaryOperationFactory extends BaseOperationFactory {
   public GetOperation get(String key, Callback callback) {
     return new GetOperationImpl(key, callback);
   }
+  
+  public GetOperation getBase64(String key, Callback callback) {
+	  return new GetObjOperationImpl(key, callback);
+  }
 
   public ReplicaGetOperation replicaGet(String key, int index,
     ReplicaGetOperation.Callback callback) {

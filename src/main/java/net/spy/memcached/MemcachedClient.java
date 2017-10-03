@@ -1003,6 +1003,7 @@ public class MemcachedClient extends SpyObject implements MemcachedClientIF,
     return asyncStore(StoreType.replace, key, exp, o, transcoder);
   }
 
+  
   /**
    * Get the given key asynchronously.
    *
@@ -1045,6 +1046,38 @@ public class MemcachedClient extends SpyObject implements MemcachedClientIF,
     return rv;
   }
 
+  public <T> GetFuture<T> asyncGetBase64(final String key, final Transcoder<T> tc) {
+
+	    final CountDownLatch latch = new CountDownLatch(1);
+	    final GetFuture<T> rv = new GetFuture<T>(latch, operationTimeout, key,
+	      executorService);
+	    Operation op = opFact.getBase64(key, new GetOperation.Callback() {
+	      private Future<T> val;
+
+	      @Override
+	      public void receivedStatus(OperationStatus status) {
+	        rv.set(val, status);
+	      }
+
+	      @Override
+	      public void gotData(String k, int flags, byte[] data) {
+	        assert key.equals(k) : "Wrong key returned";
+	        val =
+	            tcService.decode(tc, new CachedData(flags, data, tc.getMaxSize()));
+	      }
+
+	      @Override
+	      public void complete() {
+	        latch.countDown();
+	        rv.signalComplete();
+	      }
+	    });
+	    rv.setOperation(op);
+	    mconn.enqueueOperation(key, op);
+	    return rv;
+	  }
+
+  
   /**
    * Get the given key asynchronously and decode with the default transcoder.
    *
@@ -1241,6 +1274,24 @@ public class MemcachedClient extends SpyObject implements MemcachedClientIF,
     }
   }
 
+  public <T> T getBase64(String key, Transcoder<T> tc) {
+    try {
+      return asyncGetBase64(key, tc).get(operationTimeout, TimeUnit.MILLISECONDS);
+    } catch (InterruptedException e) {
+      throw new RuntimeException("Interrupted waiting for value", e);
+    } catch (ExecutionException e) {
+      if(e.getCause() instanceof CancellationException) {
+        throw (CancellationException) e.getCause();
+      } else {
+        throw new RuntimeException("Exception waiting for value", e);
+      }
+    } catch (TimeoutException e) {
+      throw new OperationTimeoutException("Timeout waiting for value: "
+        + buildTimeoutMessage(operationTimeout, TimeUnit.MILLISECONDS), e);
+    }
+  }
+
+  
   /**
    * Get with a single key and decode using the default transcoder.
    *
@@ -1256,6 +1307,10 @@ public class MemcachedClient extends SpyObject implements MemcachedClientIF,
     return get(key, transcoder);
   }
 
+  public Object getBase64(String key) {
+	    return getBase64(key, transcoder);
+  }
+  
   /**
    * Asynchronously get a bunch of objects from the cache.
    *

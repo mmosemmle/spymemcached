@@ -54,6 +54,7 @@ import net.spy.memcached.ops.TapOperation;
 import net.spy.memcached.ops.TouchOperation;
 import net.spy.memcached.ops.UnlockOperation;
 import net.spy.memcached.ops.VersionOperation;
+import net.spy.memcached.protocol.binary.GetObjOperationImpl;
 import net.spy.memcached.tapmessage.RequestMessage;
 import net.spy.memcached.tapmessage.TapOpcode;
 
@@ -91,6 +92,10 @@ public class AsciiOperationFactory extends BaseOperationFactory {
     return new GetOperationImpl(key, cb);
   }
 
+  public GetOperation getBase64(String key, GetOperation.Callback cb) {
+	  return new GetObjOperationImpl(key, cb);
+  }
+  
   public GetOperation get(Collection<String> keys, GetOperation.Callback cb) {
     return new GetOperationImpl(keys, cb);
   }

@@ -142,6 +142,8 @@ public interface OperationFactory {
    * @return a new GetOperation
    */
   GetOperation get(String key, GetOperation.Callback callback);
+  
+  GetOperation getBase64(String key, GetOperation.Callback callback);
 
   /**
    * Create a replica get operation.
